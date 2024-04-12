@@ -76,7 +76,7 @@ Handling other sites
     }
 
 To watch streams, add to streams.json, for example:
-    [
+    `[
         {
             "active": true,
             "id": "http://mysite.net/reggae/",
@@ -84,6 +84,6 @@ To watch streams, add to streams.json, for example:
             "site": "MySite",
             "voice": "Paulina"
         }
-    ]
+    ]`
 
 Ensure site value in streams.json matches a key in tags.json
