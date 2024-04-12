@@ -77,7 +77,7 @@ Handling other sites
 }
 ```
 
-To watch streams, add to streams.json, for example:
+ - add to streams.json, for example:
 ```
 [
     {
