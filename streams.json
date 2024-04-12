@@ -1,0 +1,65 @@
+[
+    {
+        "active": true,
+        "id": "https://somafm.com/seventies/",
+        "name": "Left Coast 70s",
+        "site": "Soma.fm",
+        "voice": "Samantha"
+    },
+    {
+        "active": true,
+        "id": "https://somafm.com/sonicuniverse/",
+        "name": "Sonic Universe",
+        "site": "Soma.fm",
+        "voice": "Daniel"
+    },
+    {
+        "active": true,
+        "id": "https://somafm.com/suburbsofgoa/",
+        "name": "Suburbs of Goa",
+        "site": "Soma.fm",
+        "voice": "Lekha"
+    },
+    {
+        "active": true,
+        "id": "https://somafm.com/secretagent/",
+        "name": "Secret Agent",
+        "site": "Soma.fm",
+        "voice": "Yuri"
+    },
+    {
+        "active": true,
+        "id": "https://somafm.com/specials/",
+        "name": "SomaFM Specials",
+        "site": "Soma.fm",
+        "voice": "Moira"
+    },
+    {
+        "active": true,
+        "id": "https://somafm.com/bossa/",
+        "name": "Bossa Beyond",
+        "site": "Soma.fm",
+        "voice": "Joana"
+    },
+    {
+        "active": true,
+        "id": "https://somafm.com/groovesalad/",
+        "name": "Groove Salad",
+        "site": "Soma.fm",
+        "voice": "Maged"
+    },
+    {
+        "active": true,
+        "id": "https://somafm.com/brfm/",
+        "name": "Black Rock FM",
+        "site": "Soma.fm",
+        "voice": "Zuzana"
+    },
+    {
+        "active": true,
+        "id": "https://somafm.com/thistle/",
+        "name": "ThistleRadio",
+        "site": "Soma.fm",
+        "voice": "Luca"
+    }
+]
