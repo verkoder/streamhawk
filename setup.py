@@ -1,16 +1,18 @@
+'''
+To build OSX application:
+    rm -rf /build /dist
+    py setup.py p2app
+'''
 from setuptools import setup
-# TO BUILD APP:
-#   rm -rf /build /dist
-#   py setup.py p2app
 
-APP = ['StreamHawk.py']
+APP = ['app.py']
 DATA_FILES = [
-    './app/sirius.json',
-    './app/soma.json',
-    './app/tags.json',
-    './app/voices.json',
-    './user/artists.json',
-    './user/streams.json'
+    'sirius.json',
+    'soma.json',
+    'tags.json',
+    'voices.json',
+    'artists.json',
+    'streams.json'
 ]
 OPTIONS = {
     'iconfile': '/Users/scotty/Documents/hawk/img/logo.icns',
