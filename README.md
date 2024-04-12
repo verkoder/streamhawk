@@ -70,8 +70,20 @@ Handling other sites
 - find a stream’s live playlist & inspect its HTML
 - make a regex with match.group(1) => “Artist – Song”
 - add site name/regex pattern as key/value pair to tags.json, for example:
-{ "Soma.fm": "Now Playing: (.?)</p>", "MySite": "Spinning (.*?)<br>"}
+    {
+        "Soma.fm": "Now Playing: (.?)</p>",
+        "MySite": "Spinning (.*?)<br>"
+    }
 
 To watch streams, add to streams.json, for example:
-[{ "active": true, "id": "http://mysite.net/reggae/", "name": "My Reggae Radio", "site": "MySite", "voice": "Paulina"}]
+    [
+        {
+            "active": true,
+            "id": "http://mysite.net/reggae/",
+            "name": "My Reggae Radio",
+            "site": "MySite",
+            "voice": "Paulina"
+        }
+    ]
+
 Ensure site value in streams.json matches a key in tags.json
