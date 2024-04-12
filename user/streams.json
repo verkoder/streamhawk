@@ -1,0 +1,37 @@
+[
+    {
+        "active": true,
+        "id": "https://somafm.com/seventies/",
+        "name": "70s",
+        "site": "Soma.fm",
+        "voice": "Samantha"
+    },
+    {
+        "active": true,
+        "id": "https://somafm.com/sonicuniverse/",
+        "name": "Jazz",
+        "site": "Soma.fm",
+        "voice": "Daniel"
+    },
+    {
+        "active": true,
+        "id": "https://somafm.com/suburbsofgoa/",
+        "name": "Goa",
+        "site": "Soma.fm",
+        "voice": "Lekha"
+    },
+    {
+        "active": true,
+        "id": "https://somafm.com/bossa/",
+        "name": "Bossa",
+        "site": "Soma.fm",
+        "voice": "Jorge"
+    },
+    {
+        "active": true,
+        "id": "https://somafm.com/specials/",
+        "name": "Specials",
+        "site": "Soma.fm",
+        "voice": "Maged"
+    }
+]
