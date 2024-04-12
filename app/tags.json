@@ -1,0 +1,1 @@
+{"Soma.fm": "(?is)<span class=\"red\">Now Playing: </span>(.*?)\\s*<br/>"}
