@@ -1,5 +1,5 @@
 import requests
-from StreamHawk import jdump
+from app import jdump
 
 
 def get_sirius():

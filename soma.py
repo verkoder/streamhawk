@@ -1,6 +1,6 @@
 import re
 import requests
-from StreamHawk import jdump
+from app import jdump
 
 URL = 'https://somafm.com/'
 SOMA = re.compile(r'(?is)<li class="cbshort">\s*<a href="/(.*?)/".*?<h3>(.*?)</h3>')
