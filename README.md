@@ -76,7 +76,6 @@ Handling other sites
     "MySite": "Spinning (.*?)<br>"
 }
 ```
-
  - add to streams.json, for example:
 ```
 [
@@ -89,5 +88,9 @@ Handling other sites
     }
 ]
 ```
+Ensure each "site" value in streams.json matches a key in tags.json.
+SiriusXM data is retrieved via API so has no associated regex tag.
 
-Ensure site value in streams.json matches a key in tags.json
+Disclaimer
+----------
+Not affiliated, associated, authorized, endorsed by, or in any way officially connected with SomaFM.com LLC, Sirius XM Radio Inc., or AllMusic, NetAktion LLC. The official websites can be found respectively at somafm.com, siriusxm.com, and allmusic.com. Channel names are registered trademarks of their respective owners.
