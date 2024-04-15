@@ -46,50 +46,24 @@ CUSTOMIZING
 
 Right-click on StreamHawk and Show Package Contents. See the files in Contents/Resources.
 
-Resetting User Preferences
---------------------------
-User preferences are stored as two JSON files. To reset, delete both files.
+Resetting User Data
+-------------------
+User data is stored as three JSON files. To reset, delete the files.
 - artists.json – artists & keywords
 - streams.json – added streams
+- user.json - app preferences
 
-Extending StreamHawk
+Customizing StreamHawk
 --------------------
-Customize and extend StreamHawk via these JSON files.
+Adjust available streams & voices in these JSON files.
 - sirius.json – SiriusXM streams
 - soma.json – Soma.fm streams
-- tags.json – site regexes
 - voices.json – Mac voice options
 
 Adding voices
 - StreamHawk starts with 9 male and 9 female MacOS voices.
 - To see all available voices, open a Terminal and type: say -v ?
 - To add a voice to StreamHawk, add to voices.json
-
-Handling other sites
---------------------
-- find a stream’s live playlist & inspect its HTML
-- make a regex with match.group(1) => “Artist – Song”
-- add site name/regex pattern as key/value pair to tags.json, for example:
-```
-{
-    "Soma.fm": "Now Playing: (.?)</p>",
-    "MySite": "Spinning (.*?)<br>"
-}
-```
- - add to streams.json, for example:
-```
-[
-    {
-        "active": true,
-        "id": "http://mysite.net/reggae/",
-        "name": "My Reggae Radio",
-        "site": "MySite",
-        "voice": "Paulina"
-    }
-]
-```
-Ensure each "site" value in streams.json matches a key in tags.json.
-SiriusXM data is retrieved via API so has no associated regex tag.
 
 Disclaimer
 ----------
