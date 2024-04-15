@@ -1,18 +1,12 @@
-import re
 import requests
-from app import jdump
-
-URL = 'https://somafm.com/'
-SOMA = re.compile(r'(?is)<li class="cbshort">\s*<a href="/(.*?)/".*?<h3>(.*?)</h3>')
+from app import SOMA, jdump
 
 
 def get_soma():
-    'get all SomaFM names & playlist URLs via web'
-    response = requests.get(URL)
+    'get Soma.fm channel names/ids via API'
+    response = requests.get(SOMA)
     if response.status_code == 200:
 
-        # save SomaFM names & URLs
-        html = response.content.decode('utf-8')
-        shows = [(x.group(2), f'{URL}{x.group(1)}/') for x in SOMA.finditer(html)]
-        shows = {k: v for k,v in sorted(shows)}
-        jdump(shows, 'soma')
+        # save SomaFM names
+        shows = response.json()['channels']
+        jdump({x['title']: x['id'] for x in shows}, 'soma')

@@ -1,65 +1,65 @@
 [
     {
         "active": true,
-        "id": "https://somafm.com/seventies/",
+        "id": "seventies",
         "name": "Left Coast 70s",
         "site": "Soma.fm",
         "voice": "Samantha"
     },
     {
         "active": true,
-        "id": "https://somafm.com/sonicuniverse/",
+        "id": "sonicuniverse",
         "name": "Sonic Universe",
         "site": "Soma.fm",
         "voice": "Daniel"
     },
     {
         "active": true,
-        "id": "https://somafm.com/suburbsofgoa/",
+        "id": "suburbsofgoa",
         "name": "Suburbs of Goa",
         "site": "Soma.fm",
         "voice": "Lekha"
     },
     {
         "active": true,
-        "id": "https://somafm.com/secretagent/",
+        "id": "secretagent",
         "name": "Secret Agent",
         "site": "Soma.fm",
         "voice": "Yuri"
     },
     {
         "active": true,
-        "id": "https://somafm.com/specials/",
-        "name": "SomaFM Specials",
-        "site": "Soma.fm",
-        "voice": "Moira"
-    },
-    {
-        "active": true,
-        "id": "https://somafm.com/bossa/",
+        "id": "bossa",
         "name": "Bossa Beyond",
         "site": "Soma.fm",
         "voice": "Joana"
     },
     {
         "active": true,
-        "id": "https://somafm.com/groovesalad/",
+        "id": "groovesalad",
         "name": "Groove Salad",
         "site": "Soma.fm",
         "voice": "Maged"
     },
     {
         "active": true,
-        "id": "https://somafm.com/brfm/",
-        "name": "Black Rock FM",
+        "id": "specials",
+        "name": "SomaFM Specials",
         "site": "Soma.fm",
-        "voice": "Zuzana"
+        "voice": "Karen"
     },
     {
-        "active": true,
-        "id": "https://somafm.com/thistle/",
+        "active": false,
+        "id": "thistle",
         "name": "ThistleRadio",
         "site": "Soma.fm",
         "voice": "Luca"
+    },
+    {
+        "active": false,
+        "id": "u80s",
+        "name": "Underground 80s",
+        "site": "Soma.fm",
+        "voice": "Moira"
     }
 ]

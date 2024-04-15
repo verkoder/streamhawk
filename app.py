@@ -1,10 +1,10 @@
-import re
 import json
 import requests
 import threading
 import webbrowser
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox, scrolledtext, simpledialog
+from tkinter import ttk, messagebox, scrolledtext, simpledialog
+from glob import glob
 from os import system
 from time import sleep
 from urllib.parse import quote_plus
@@ -12,32 +12,28 @@ from urllib.parse import quote_plus
 
 SITES = {'soma': 'Soma.fm',
          'sirius': 'SiriusXM'}
+SOMA = 'http://api.somafm.com/channels.json'
 
 def hawk_error(msg):
     messagebox.showerror('StreamHawk Error', msg)
 
-def hawk_warning(msg):
-    messagebox.showwarning('StreamHawk Warning', msg)
-
-# JSON METHODS
-def jload(name, fullpath=False):
-    name = name if fullpath else f'{name}.json'
+def jload(name):
     try:
-        with open(name) as f:
+        with open(f'{name}.json') as f:
             return json.load(f)
     except FileNotFoundError:
-        data = [] if 'artists' in name or 'streams' in name else {}
-        json.dump(data, open(name, 'w'), indent=4)
+        data = [] if name in ('artists', 'streams') else {}
+        json.dump(data, open(f'{name}.json', 'w'), indent=4)
         return data
     except json.JSONDecodeError as err:
-        hawk_error(f'Error in "{name}" file:\n{err}')
+        hawk_error(f'Error in "{name}.json" file:\n{err}')
 
 def jdump(data, name):
     try:
         with open(f'{name}.json', 'w') as f:
             json.dump(data, f, indent=4)
     except FileNotFoundError:
-        hawk_error(f'Missing file: "{name}"')
+        hawk_error(f'Missing file: "{name}.json"')
 
 # POPUP WINDOWS
 class Popup(tk.Toplevel):
@@ -50,19 +46,18 @@ class AddArtist(Popup):
         tk.Toplevel.__init__(self, parent, padx=5, pady=5)
         self.parent = parent
         self.tunes = tunes
-        self.arts = jload(self.parent.artists)
-
+        self.artists = jload('artists')
         self.title('Add Artist')
-        self.geometry(f'485x400+50+{self.parent.height + 44}')
+        self.geometry(f'485x{25 + self.parent.height * 3}+50+{self.parent.height + 44}')
         self.minsize(350, 150)
         self.configure(background='black')
 
         nav = tk.LabelFrame(self, background='black', pady=5, border=0)
         nav.pack()
-        self.btn_add = ttk.Button(nav, text='Add', command=self.add)
-        self.btn_cancel = ttk.Button(nav, text='Cancel', command=self.destroy)
-        self.btn_add.grid(row=0, column=0, padx=5)
-        self.btn_cancel.grid(row=0, column=1, padx=5)
+        btn_add = ttk.Button(nav, text='Add', command=self.add)
+        btn_cancel = ttk.Button(nav, text='Cancel', command=self.destroy)
+        btn_add.grid(row=0, column=0, padx=5)
+        btn_cancel.grid(row=0, column=1, padx=5)
 
         art_frame = tk.LabelFrame(self, padx=5, pady=5, background='white')
         art_frame.pack()
@@ -74,15 +69,14 @@ class AddArtist(Popup):
             setattr(self, f'box_{i}', tk.Checkbutton(art_frame, text=art, variable=getattr(self, f'var_{i}')))
             box = getattr(self, f'box_{i}')
             box.deselect()
-            if art in self.arts:
+            if art in self.artists:
                 box.config(state=tk.DISABLED)
             box.grid(row=i+1, column=0, padx=5, sticky=tk.W)
             getattr(self, f'url_{i}').grid(row=i+1, column=1, padx=5, pady=5, ipadx=5, ipady=5, sticky=tk.E)
 
     def add(self):
-        artists = jload(self.parent.artists)
-        artists += [x for i,(x,_) in enumerate(self.tunes) if getattr(self, f'var_{i}').get()]
-        jdump(sorted(artists), self.parent.artists)
+        self.artists += [x for i,(x,_) in enumerate(self.tunes) if getattr(self, f'var_{i}').get()]
+        jdump(sorted(self.artists), 'artists')
         self.destroy()
 
 class Artists(Popup):
@@ -97,33 +91,20 @@ class Artists(Popup):
         nav = tk.LabelFrame(self, background='black', pady=5, border=0)
         nav.pack()
         btn_save = ttk.Button(nav, text='Save', command=self.save)
-        btn_load = ttk.Button(nav, text='Load', command=self.load)
         btn_cancel = ttk.Button(nav, text='Cancel', command=self.destroy)
         btn_save.grid(row=0, column=0, padx=5)
-        btn_load.grid(row=0, column=1, padx=5)
         btn_cancel.grid(row=0, column=2, padx=5)
 
-        txt_frame = tk.LabelFrame(self, padx=5, background='black', border=0)
-        txt_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=tk.YES)
-        self.txt = scrolledtext.ScrolledText(txt_frame, height=35, width=50)
-        self.txt.pack(side=tk.LEFT, fill=tk.BOTH, expand=tk.YES)
-        self.txt.insert(tk.END, '\n'.join(jload(self.parent.artists)))
+        art_frame = tk.LabelFrame(self, padx=5, background='black', border=0)
+        art_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=tk.YES)
+        self.text = scrolledtext.ScrolledText(art_frame, height=35, width=50)
+        self.text.pack(side=tk.LEFT, fill=tk.BOTH, expand=tk.YES)
+        self.text.insert(tk.END, '\n'.join(jload('artists')))
 
     def save(self):
-        artists = [x.strip() for x in self.txt.get(1.0, tk.END).split('\n')]
-        jdump(sorted([x for x in set(artists) if x]), self.parent.artists)
+        artists = [x.strip() for x in self.text.get(1.0, tk.END).split('\n')]
+        jdump(sorted([x for x in set(artists) if x]), 'artists')
         self.destroy()
-
-    def load(self):
-        fil = filedialog.askopenfilename()
-        if fil:
-            arts = jload(fil, fullpath=True)
-            if isinstance(arts, list):
-                self.txt.delete(1.0, tk.END)
-                self.txt.insert(tk.END, '\n'.join(arts))
-                self.parent.artists = fil.split('/')[-1].replace('.json', '')
-            else:
-                hawk_error(arts)
 
 class Streams(Popup):
     def __init__(self, parent, *args, **kwargs):
@@ -138,43 +119,46 @@ class Streams(Popup):
 
         nav = tk.LabelFrame(self, background='black', pady=5, border=0)
         nav.pack()
+        btn_autoplay = ttk.Checkbutton(nav, text='Play', variable=self.parent.autoplay)
         btn_talk = ttk.Checkbutton(nav, text='Talk', variable=self.parent.talk)
         btn_save = ttk.Button(nav, text='Save', command=self.save)
         btn_close = ttk.Button(nav, text='Close', command=self.destroy)
         lab_manage = ttk.Label(nav, text='Manage', background='black', foreground='white')
         lab_manage.bind('<Button-1>', lambda x: self.parent.popup('Manage'))
-        lab_reorder = ttk.Label(nav, text='Arrange', background='black', foreground='white')
-        lab_reorder.bind('<Button-1>', lambda x: self.parent.popup('Arrange'))
-        btn_talk.grid(row=0, column=0, padx=5)
-        btn_save.grid(row=0, column=1, padx=5)
-        btn_close.grid(row=0, column=2, padx=5)
-        lab_manage.grid(row=0, column=3, padx=5)
-        lab_reorder.grid(row=0, column=4, padx=5)
+        lab_order = ttk.Label(nav, text='Arrange', background='black', foreground='white')
+        lab_order.bind('<Button-1>', lambda x: self.parent.popup('Arrange'))
+        btn_autoplay.grid(row=0, column=0, padx=5)
+        btn_talk.grid(row=0, column=1, padx=5)
+        btn_save.grid(row=0, column=2, padx=5)
+        btn_close.grid(row=0, column=3, padx=5)
+        lab_manage.grid(row=0, column=4, padx=5)
+        lab_order.grid(row=0, column=5, padx=5)
+        if not self.parent.user.get('player'):
+            btn_autoplay.configure(state='disabled')
+            btn_autoplay.bind('<Button-1>', lambda x: hawk_error('Play unavailable:\nInstall VLC to play Soma.fm streams'))
 
-        shows_frame = tk.LabelFrame(self, text='Voices / Active Streams', background='white', padx=5, pady=5, border=1)
-        shows_frame.pack(anchor=tk.CENTER)
         col = 0
         vox = jload('voices')
+        sho_frame = tk.LabelFrame(self, text='Voices / Active Streams', background='white', padx=5, pady=5, border=1)
+        sho_frame.pack(anchor=tk.CENTER)
         for i,show in enumerate(self.parent.streams):
             if i >= half:
                 i -= half
                 col = 2
-            name = show['name']
-            setattr(self, name, tk.BooleanVar())
-            setattr(self, f'box_{name}', tk.Checkbutton(shows_frame, text=name, width=25, justify=tk.LEFT,
-                                                        variable=getattr(self, name)))
-            box = getattr(self, f'box_{name}')
+            setattr(self, show['name'], tk.BooleanVar())
+            setattr(self, f'box_{show["name"]}', tk.Checkbutton(sho_frame, text=show['name'], width=25, justify=tk.LEFT,
+                                                                variable=getattr(self, show['name'])))
             if show['active']:
-                box.select()
+                getattr(self, f'box_{show["name"]}').select()
             else:
-                box.deselect()
-            box.grid(row=i, column=col+1, sticky=tk.W)
-            setattr(self, f'vox_{name}', tk.StringVar())
-            setattr(self, f'opt_{name}', ttk.OptionMenu(shows_frame, getattr(self, f'vox_{name}'), vox[0], *vox))
-            getattr(self, f'vox_{name}').set(show['voice'])
-            getattr(self, f'box_{name}').bind('<Button-1>', self.audition)
-            getattr(self, f'opt_{name}').grid(row=i, column=col)
-            getattr(self, f'opt_{name}').config(width=15)
+                getattr(self, f'box_{show["name"]}').deselect()
+            setattr(self, f'vox_{show["name"]}', tk.StringVar())
+            setattr(self, f'opt_{show["name"]}', ttk.OptionMenu(sho_frame, getattr(self, f'vox_{show["name"]}'), vox[0], *vox))
+            getattr(self, f'vox_{show["name"]}').set(show['voice'])
+            getattr(self, f'box_{show["name"]}').bind('<Button-1>', self.audition)
+            getattr(self, f'box_{show["name"]}').grid(row=i, column=col+1, sticky=tk.W)
+            getattr(self, f'opt_{show["name"]}').grid(row=i, column=col)
+            getattr(self, f'opt_{show["name"]}').config(width=15)
 
     def audition(self, btn):
         if self.parent.talk.get():
@@ -187,7 +171,10 @@ class Streams(Popup):
             show['active'] = getattr(self, show['name']).get()
             show['voice'] = getattr(self, f'vox_{show["name"]}').get()
         jdump(self.parent.streams, 'streams')
-        self.parent.refit_window()
+        self.parent.user['autoplay'] = self.parent.autoplay.get()
+        self.parent.user['talk'] = self.parent.talk.get()
+        jdump(self.parent.user, 'user')
+        self.parent.resize()
 
 class Manage(Popup):
     def __init__(self, parent, *args, **kwargs):
@@ -228,7 +215,7 @@ class Manage(Popup):
         self.list_shows.pack()
 
         sirius_var = tk.StringVar(value=list(self.sirius.keys()))
-        sirius_frame = tk.LabelFrame(meta, text='SiriusXM Streams'.rjust(44), padx=5, pady=5, background='white', border=0,
+        sirius_frame = tk.LabelFrame(meta, text='SiriusXM Streams'.rjust(45), padx=5, pady=5, background='white', border=0,
                                     font='Calibri 14 bold')
         sirius_frame.grid(row=1, column=4)
         self.list_sirius = tk.Listbox(sirius_frame, listvariable=sirius_var, selectmode='multiple', height=30, width=22)
@@ -252,7 +239,7 @@ class Manage(Popup):
                         site=SITES[site],
                         voice='Alex') for x in adds if not shows[x] in ids]
             if size + len(adds) > 24:
-                hawk_warning('Limit of 24 streams - not all were added')
+                hawk_error('Limit of 24 streams - not all were added')
                 adds = adds[:24-len(self.parent.streams)]
             self.parent.streams.extend(adds)
             self.save()
@@ -275,7 +262,7 @@ class Manage(Popup):
     def save(self):
         self.stream_var.set([x['name'] for x in self.parent.streams])
         jdump(self.parent.streams, 'streams')
-        self.parent.refit_window()
+        self.parent.resize()
 
 class Arrange(Popup):
     def __init__(self, parent, *args, **kwargs):
@@ -288,38 +275,36 @@ class Arrange(Popup):
 
         nav = tk.LabelFrame(self, background='black', pady=5, border=0)
         nav.pack()
-        self.btn_save = ttk.Button(nav, text='Save', command=self.save)
-        self.btn_close = ttk.Button(nav, text='Close', command=self.parent.popup)
-        self.btn_save.grid(row=0, column=0, padx=5)
-        self.btn_close.grid(row=0, column=2, padx=5)
+        btn_save = ttk.Button(nav, text='Save', command=self.save)
+        btn_close = ttk.Button(nav, text='Close', command=self.parent.popup)
+        btn_save.grid(row=0, column=0, padx=5)
+        btn_close.grid(row=0, column=2, padx=5)
 
-        self.order_frame = tk.LabelFrame(self, padx=5, pady=5, background='white', border=0)
-        self.order_frame.pack(anchor=tk.CENTER)
+        self.sho_frame = tk.LabelFrame(self, padx=5, pady=5, background='white', border=0)
+        self.sho_frame.pack(anchor=tk.CENTER)
         self.size = len(self.parent.streams) - 1
-        self.buttons()
+        self.arrange()
 
-    def buttons(self, evt=None):
+    def arrange(self, evt=None):
         if evt:
             show = self.parent.streams.pop(evt.widget.indx)
-            shift = -1 if evt.widget.cget('text') == 'Up' else 1
-            self.parent.streams.insert(evt.widget.indx + shift, show)
+            self.parent.streams.insert(evt.widget.indx + (-1 if evt.widget.cget('text') == 'Up' else 1), show)
         for i,show in enumerate(self.parent.streams):
-            name = show['name']
-            lbl = tk.Label(self.order_frame, text=name.ljust(45))
+            lbl = tk.Label(self.sho_frame, text=show['name'].ljust(45))
             lbl.grid(row=i, column=0, sticky=tk.W, padx=5)
             if i != 0:
-                setattr(self, 'u_{name}', ttk.Button(self.order_frame, text='Up'))
-                btn = getattr(self, 'u_{name}')
-                btn.bind('<Button-1>', self.buttons)
+                setattr(self, f'u_{show["name"]}', ttk.Button(self.sho_frame, text='Up'))
+                btn = getattr(self, f'u_{show["name"]}')
+                btn.bind('<Button-1>', self.arrange)
                 btn.indx = i
                 btn.grid(row=i, column=1, padx=10)
             if i != self.size:
-                setattr(self, 'd_{name}', ttk.Button(self.order_frame, text='Down'))
-                btn = getattr(self, 'd_{name}')
-                btn.bind('<Button-1>', self.buttons)
+                setattr(self, f'd_{show["name"]}', ttk.Button(self.sho_frame, text='Down'))
+                btn = getattr(self, f'd_{show["name"]}')
+                btn.bind('<Button-1>', self.arrange)
                 btn.indx = i
                 btn.grid(row=i, column=2, padx=10)
-        self.order_frame.update()
+        self.sho_frame.update()
 
     def save(self):
         jdump(self.parent.streams, 'streams')
@@ -327,121 +312,131 @@ class Arrange(Popup):
 
 # MAIN WINDOW
 class Hawk(tk.LabelFrame):
+    changed = False
     height = 112
-    artists = 'artists'
     play = {}
-    tags = {x: re.compile(y) for x,y in jload('tags').items()}
+    soma = {}
+    threaded = False
+    win = False
     def __init__(self, parent, *args, **kwargs):
         tk.LabelFrame.__init__(self, parent, padx=2, pady=2, border=0)
         self.parent = parent
-        self.win = False
         self.thread = threading.Thread(target=lambda: None)
         self.thread._stop_event = threading.Event()
-        self.threaded = False
-        self.changed = False
         self.second = tk.StringVar()
 
-        self.talk = tk.BooleanVar()
-        self.talk.set(True)
         self.streams = jload('streams')
+        self.user = jload('user')
+        self.autoplay = tk.BooleanVar()
+        self.talk = tk.BooleanVar()
+        self.autoplay.set(self.user.get('autoplay', False))
+        self.talk.set(self.user.get('talk', True))
+        vlc = [x for x in glob('/Applications/*.app') if 'VLC' in x]
+        self.user['player'] = vlc[0] if vlc else ''
+        jdump(self.user, 'user')
 
         self.btn_pause = ttk.Button(self, text='PAUSED', style='paused.TButton', command=self.thread_stop)
         btn_artists = ttk.Button(self, text='for Artists', command=lambda: self.popup('Artists'))
         btn_shows = ttk.Button(self, text='in Streams', command=self.popup)
-        opt_seconds = ttk.OptionMenu(self, self.second, 'every 15 sec',
-                                                          *[f'every {x} sec' for x in (15, 30, 45)])
+        opt_seconds = ttk.OptionMenu(self, self.second, 'every 15 sec', *[f'every {x} sec' for x in (15, 30, 45)])
         opt_seconds.config(width=9)
         btn_quit = ttk.Button(self, text='QUIT', command=self.quit)
-        self.playlist = tk.Text(self, height=4, font='Calibri 11')
-        self.playlist.tag_configure('bold', font='Calibri 11 bold')
-        self.playlist.configure(state='disabled')
-        self.playlist.bind("<Double-Button-1>", lambda x: self.popup('AddArtist'))
+        self.text = tk.Text(self, height=4, font='Calibri 11')
+        self.text.tag_configure('bold', font='Calibri 11 bold')
+        self.text.configure(state='disabled')
+        self.text.bind("<Double-Button-1>", lambda x: self.popup('AddArtist'))
 
         self.btn_pause.grid(row=0, column=0, sticky=tk.EW, ipadx=12)
         btn_artists.grid(row=0, column=1, sticky=tk.EW)
         btn_shows.grid(row=0, column=2, sticky=tk.EW)
         opt_seconds.grid(row=0, column=3, sticky=tk.EW)
         btn_quit.grid(row=0, column=4, sticky=tk.EW, ipadx=12)
-        self.playlist.grid(row=1, column=0, columnspan=5, sticky=tk.EW)
+        self.text.grid(row=1, column=0, columnspan=5, sticky=tk.EW)
 
-    def monitor(self):
-        if [x['active'] for x in self.streams]:
-            artists = jload(self.artists)
-            while not self.thread._stop_event.is_set():
-                self.changed = False
-                for show in [x for x in self.streams if x['active']]:
-                    tune = self.now_on(show)
-                    if not tune:
-                        continue
-                    name = show['name']
-                    found = False
-                    for artist in artists:
-                        if artist not in tune:
-                            continue
-                        if self.talk.get() and self.play.get(name) != f'{tune}**':
-                            system(f'say -v {show["voice"]} "{artist} on {name}"')
-                        found = True
-                        break
-                    self.play[name] = tune + ('**' if found else '')
-                    self.print_tracks()
-                    for _ in range(int(self.second.get()[6:8]) * 5):
-                        if self.thread._stop_event.is_set() or self.changed:
-                            break
-                        sleep(0.2)
-                    if self.thread._stop_event.is_set() or self.changed:
-                        break
-        else:
-            hawk_error('No active streams!')
+    def announce(self, artist, show):
+        if self.autoplay.get() and show['site'] == 'Soma.fm':
+            system(f'open {self.user["player"]} --args https://somafm.com/{show["id"]}.pls')
+        if self.talk.get():
+            system(f'say -v {show["voice"]} "{artist} on {show["name"]}"')
 
-    def now_on(self, show):
+    def currently_on(self, show):
         if show['site'] == 'SiriusXM':
             response = requests.get(f'https://xmplaylist.com/api/station/{show["id"]}')
             if response.status_code == 200:
                 tune = response.json()[0].get('track', {})
                 if 'name' in tune and 'artists' in tune:
                     return f'{", ".join(tune["artists"])} - {tune["name"]}'
-        elif show['site'] in self.tags: # Soma.fm or custom regex
-            response = requests.get(show['id'])
+        elif show['site'] == 'Soma.fm':
+            return self.soma[show['id']]
+        return ''
+
+    def get_shows(self):
+        self.changed = False
+        shows = [x for x in self.streams if x['active']]
+        self.soma = {x['id']: '' for x in shows if x['site'] == 'Soma.fm'}
+        if self.soma:
+            response = requests.get(SOMA)
             if response.status_code == 200:
-                tune = self.tags[show['site']].search(response.content.decode('utf-8'))
+                self.soma = {x['id']: x['lastPlaying'] for x in response.json()['channels'] if x['id'] in self.soma}
+        return shows
+
+    def monitor(self):
+        if not True in {x['active'] for x in self.streams}:
+            return hawk_error('No active streams!')
+
+        artists = jload('artists')
+        while not self.thread._stop_event.is_set():
+            for show in self.get_shows():
+                tune = self.currently_on(show)
                 if tune:
-                    return tune.group(1)
-        return None
+                    fave = False
+                    for artist in artists:
+                        if artist in tune:
+                            fave = True
+                            if self.play.get(show['name']) != f'{tune}**':
+                                self.announce(artist, show)
+                            break
+                    self.play[show['name']] = tune + ('**' if fave else '')
+                    self.refresh()
+            for _ in range(int(self.second.get()[6:8]) * 5):
+                if self.thread._stop_event.is_set() or self.changed:
+                    break
+                sleep(0.2)
 
     def popup(self, win='Streams'):
         if win == 'Arrange' and len(self.streams) <= 1:
-            hawk_error('Nothing to arrange!')
+            return hawk_error('Nothing to arrange!')
+        if self.win:
+            self.win.destroy()
+        if win == 'AddArtist':
+            tunes = [x.replace('**', '').split(' - ') for x in self.play.values() if ' - ' in x]
+            if tunes:
+                self.win = AddArtist(self, tunes)
         else:
-            if self.win:
-                self.win.destroy()
-            if win == 'AddArtist':
-                tunes = [x.replace('**', '').split(' - ') for x in self.play.values() if ' - ' in x]
-                if tunes:
-                    self.win = AddArtist(self, tunes)
-            else:
-                self.win = globals()[win](self)
-
-    def print_tracks(self):
-        self.playlist.configure(state='normal')
-        self.playlist.delete(1.0, tk.END)
-        for show,tune in self.play.items():
-            if tune.endswith('**'):
-                self.playlist.insert('end', f'{show}\t\t{tune[:-2][:85]}\n', 'bold')
-            elif tune:
-                self.playlist.insert('end', f'{show}\t\t{tune[:85]}\n')
-        self.playlist.configure(state='disabled')
+            self.win = globals()[win](self)
 
     def quit(self):
         self.thread._stop_event.set()
         sleep(0.2)
         self.parent.quit()
 
-    def refit_window(self):
+    def refresh(self):
+        self.text.configure(state='normal')
+        self.text.delete(1.0, tk.END)
+        for show,tune in self.play.items():
+            if tune.endswith('**'):
+                self.text.insert('end', f'{show}\t\t{tune[:-2][:85]}\n', 'bold')
+            elif tune:
+                self.text.insert('end', f'{show}\t\t{tune[:85]}\n')
+        self.text.configure(state='disabled')
+
+    def resize(self):
         self.play = {x['name']: '' for x in self.streams if x['active']}
         self.changed = True
         self.height = 56 + 14 * max((len(self.play), 1))
         self.parent.geometry(f'585x{self.height}')
-        self.playlist.configure(height=max(len(self.play)+1, 4))
+        self.text.configure(height=max(len(self.play)+1, 4))
+        self.text.delete(1.0, tk.END)
 
     def thread_stop(self):
         if self.threaded:
@@ -470,14 +465,6 @@ class Hawk(tk.LabelFrame):
     def thread_wait(self):
         self.parent.after(200, self.thread_test, self.thread)
 
-    def verify(self):
-        err = [x for x in ['artists', 'sirius', 'soma', 'streams', 'tags', 'voices'] if isinstance(jload(x), str)]
-        if err:
-            return '\n '.join(err)
-        err = [x for x in {x['site'] for x in self.streams} if x != 'SiriusXM' and not x in self.tags.keys()]
-        if err:
-            return 'No matching "tags.json" regex for:\n ' + '\n '.join(err)
-        return True
 if __name__ == '__main__':
     root = tk.Tk()
     bar = tk.Menu(root)
@@ -490,30 +477,24 @@ if __name__ == '__main__':
     root.title('StreamHawk')
     root.createcommand('tkAboutDialog', lambda: root.tk.call('tk::mac::standardAboutPanel'))
     hawk = Hawk(root)
-    msg = hawk.verify()
-    if msg is True:
-        style = ttk.Style()
-        style.theme_use('clam')
-        style.configure('TButton', font=('Calibri', 12, 'bold'), background='black', foreground='lightgray')
-        style.map('TButton', background=[('active', 'darkgreen'), ('!disabled', 'black')],
-                             foreground=[('active', 'white'), ('!disabled', 'lightgray')])
-        style.configure('paused.TButton', font=('Calibri', 12, 'bold'), background='black', foreground='lightgray')
-        style.map('paused.TButton', background=[('active', 'darkgreen'), ('!disabled', 'darkred')],
-                                    foreground=[('active', 'white'), ('!disabled', 'lightgray')])
-        style.configure('active.TButton', font=('Calibri', 12, 'bold'), background='black', foreground='lightgray')
-        style.map('active.TButton', background=[('active', 'darkgreen'), ('!disabled', 'darkgreen')],
-                                    foreground=[('active', 'white'), ('!disabled', 'lightgray')])
-        style.configure('TMenubutton', font=('Calibri', 12, 'bold'), background='black', foreground='lightgray')
-        style.map('TMenubutton', background=[('active', 'darkgreen'), ('!disabled', 'black')],
-                                 foreground=[('active', 'white'), ('!disabled', 'lightgray')])
-        style.configure('TCheckbutton', font=('Calibri', 12, 'bold'), background='black', foreground='lightgray')
-        style.map('TCheckbutton', background=[('active', 'darkgreen'), ('!disabled', 'black')],
-                                 foreground=[('active', 'white'), ('!disabled', 'lightgray')])
-        style.configure('TLabelFrame', font=('Calibri', 12, 'bold'), background='black', foreground='lightgray')
-        style.map('TLabelFrame', background=[('active', 'darkgreen'), ('!disabled', 'black')],
-                                 foreground=[('active', 'white'), ('!disabled', 'lightgray')])
-        hawk.pack(padx=5, pady=5)
-        hawk.refit_window()
-        root.mainloop()
-    else:
-        hawk_error(msg)
+    style = ttk.Style()
+    style.theme_use('clam')
+    BOLD = ('Calibri', 12, 'bold')
+    GRAY = dict(background='black', foreground='lightgray')
+    GREEN = [('active', 'darkgreen'), ('!disabled', 'black')]
+    WHITE = [('active', 'white'), ('!disabled', 'lightgray')]
+    style.configure('TButton', font=('Calibri', 12, 'bold'), **GRAY)
+    style.map('TButton', background=GREEN, foreground=WHITE)
+    style.configure('paused.TButton', font=BOLD, **GRAY)
+    style.map('paused.TButton', background=[('active', 'darkgreen'), ('!disabled', 'darkred')], foreground=WHITE)
+    style.configure('active.TButton', font=BOLD, **GRAY)
+    style.map('active.TButton', background=[('active', 'darkgreen'), ('!disabled', 'darkgreen')], foreground=WHITE)
+    style.configure('TMenubutton', font=BOLD, **GRAY)
+    style.map('TMenubutton', background=GREEN, foreground=WHITE)
+    style.configure('TCheckbutton', font=BOLD, **GRAY)
+    style.map('TCheckbutton', background=GREEN, foreground=WHITE)
+    style.configure('TLabelFrame', font=BOLD, **GRAY)
+    style.map('TLabelFrame', background=GREEN, foreground=WHITE)
+    hawk.pack(padx=5, pady=5)
+    hawk.resize()
+    root.mainloop()
