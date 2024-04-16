@@ -1,25 +1,24 @@
 '''
 To build OSX application:
-    rm -rf /build /dist
-    py setup.py p2app
+    rm -rf build/ dist/
+    python setup.py py2app
 '''
 from setuptools import setup
 
 APP = ['app.py']
 DATA_FILES = [
+    'artists.json',
     'sirius.json',
     'soma.json',
-    'tags.json',
-    'voices.json',
-    'artists.json',
-    'streams.json'
+    'streams.json',
+    'voices.json'
 ]
 OPTIONS = {
     'iconfile': '/Users/scotty/Documents/hawk/img/logo.icns',
     'plist': {
         'CFBundleName': 'StreamHawk',
         'CFBundleDisplayName': 'StreamHawk',
-        'CFBundleGetInfoString': 'Scan audio streams for favorite artists',
+        'CFBundleGetInfoString': 'StreamHawk scans playlists to announce when your favorite artists are streaming.',
         'CFBundleIdentifier': 'com.scottyvercoe.osx.streamhawk',
         'CFBundleVersion': '0.1.0',
         'CFBundleShortVersionString': '0.1.0',
