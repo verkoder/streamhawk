@@ -389,14 +389,14 @@ class Hawk(tk.LabelFrame):
             for show in self.get_shows():
                 tune = self.currently_on(show)
                 if tune:
-                    fave = False
                     for artist in artists:
                         if artist in tune:
-                            fave = True
                             if self.play.get(show['name']) != f'{tune}**':
+                                self.play[show['name']] = f'{tune}''**'
                                 self.announce(artist, show)
                             break
-                    self.play[show['name']] = tune + ('**' if fave else '')
+                    else:
+                        self.play[show['name']] = tune
                     self.refresh()
             for _ in range(int(self.second.get()[6:8]) * 5):
                 if self.thread._stop_event.is_set() or self.changed:
@@ -483,7 +483,7 @@ if __name__ == '__main__':
     GRAY = dict(background='black', foreground='lightgray')
     GREEN = [('active', 'darkgreen'), ('!disabled', 'black')]
     WHITE = [('active', 'white'), ('!disabled', 'lightgray')]
-    style.configure('TButton', font=('Calibri', 12, 'bold'), **GRAY)
+    style.configure('TButton', font=BOLD, **GRAY)
     style.map('TButton', background=GREEN, foreground=WHITE)
     style.configure('paused.TButton', font=BOLD, **GRAY)
     style.map('paused.TButton', background=[('active', 'darkgreen'), ('!disabled', 'darkred')], foreground=WHITE)
