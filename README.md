@@ -21,7 +21,7 @@ Click Manage to add Soma.fm and SiriusXM streams. To rename, right-click an adde
 
 Monitoring Streams
 ------------------
-Hit the PAUSED / WATCHING button to start / stop updating the playlist, in 15/30/45-second intervals. Favorites are shown in bold, and optionally announced and streamed.
+Hit SPACEBAR or the PAUSED / WATCHING button to start / stop updating the playlist, in 15/30/45-second intervals. Favorites are shown in bold, and optionally announced and streamed.
 
 Adding Favorite Artists
 -----------------------

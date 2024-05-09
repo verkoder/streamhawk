@@ -1,6 +1,13 @@
 [
     {
         "active": true,
+        "id": "secretagent",
+        "name": "Secret Agent",
+        "site": "Soma.fm",
+        "voice": "Yuri"
+    },
+    {
+        "active": true,
         "id": "seventies",
         "name": "Left Coast 70s",
         "site": "Soma.fm",
@@ -22,31 +29,17 @@
     },
     {
         "active": true,
-        "id": "secretagent",
-        "name": "Secret Agent",
-        "site": "Soma.fm",
-        "voice": "Yuri"
-    },
-    {
-        "active": true,
         "id": "bossa",
         "name": "Bossa Beyond",
         "site": "Soma.fm",
         "voice": "Joana"
     },
     {
-        "active": true,
+        "active": false,
         "id": "groovesalad",
         "name": "Groove Salad",
         "site": "Soma.fm",
         "voice": "Maged"
-    },
-    {
-        "active": true,
-        "id": "specials",
-        "name": "SomaFM Specials",
-        "site": "Soma.fm",
-        "voice": "Karen"
     },
     {
         "active": false,
@@ -61,5 +54,12 @@
         "name": "Underground 80s",
         "site": "Soma.fm",
         "voice": "Moira"
+    },
+    {
+        "active": true,
+        "id": "specials",
+        "name": "SomaFM Specials",
+        "site": "Soma.fm",
+        "voice": "Karen"
     }
 ]
