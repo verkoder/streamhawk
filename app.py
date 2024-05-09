@@ -1,4 +1,5 @@
 import json
+import re
 import requests
 import threading
 import webbrowser
@@ -335,7 +336,7 @@ class Hawk(tk.LabelFrame):
         self.user['player'] = vlc[0] if vlc else ''
         jdump(self.user, 'user')
 
-        self.btn_pause = ttk.Button(self, text='PAUSED', style='paused.TButton', command=self.thread_stop)
+        self.btn_pause = ttk.Button(self, text='PAUSED', style='paused.TButton', command=self.thread_switch)
         btn_artists = ttk.Button(self, text='for Artists', command=lambda: self.popup('Artists'))
         btn_shows = ttk.Button(self, text='in Streams', command=self.popup)
         opt_seconds = ttk.OptionMenu(self, self.second, 'every 15 sec', *[f'every {x} sec' for x in (15, 30, 45)])
@@ -352,6 +353,7 @@ class Hawk(tk.LabelFrame):
         opt_seconds.grid(row=0, column=3, sticky=tk.EW)
         btn_quit.grid(row=0, column=4, sticky=tk.EW, ipadx=12)
         self.text.grid(row=1, column=0, columnspan=5, sticky=tk.EW)
+        self.master.bind('<space>', self.thread_switch)
 
     def announce(self, artist, show):
         if self.autoplay.get() and show['site'] == 'Soma.fm':
@@ -380,17 +382,17 @@ class Hawk(tk.LabelFrame):
                 self.soma = {x['id']: x['lastPlaying'] for x in response.json()['channels'] if x['id'] in self.soma}
         return shows
 
-    def monitor(self):
+    def monitor(self, evt=None):
         if not True in {x['active'] for x in self.streams}:
             return hawk_error('No active streams!')
 
-        artists = jload('artists')
+        artists = [(x, re.compile('(?is)'+re.sub('\s+', '\s*', x))) for x in jload('artists')]
         while not self.thread._stop_event.is_set():
             for show in self.get_shows():
                 tune = self.currently_on(show)
                 if tune:
-                    for artist in artists:
-                        if artist in tune:
+                    for artist,regx in artists:
+                        if regx.search(tune):
                             if self.play.get(show['name']) != f'{tune}**':
                                 self.play[show['name']] = f'{tune}''**'
                                 self.announce(artist, show)
@@ -425,9 +427,9 @@ class Hawk(tk.LabelFrame):
         self.text.delete(1.0, tk.END)
         for show,tune in self.play.items():
             if tune.endswith('**'):
-                self.text.insert('end', f'{show}\t\t{tune[:-2][:85]}\n', 'bold')
+                self.text.insert('end', f'{show}\t\t{tune[:-2][:77]}\n', 'bold')
             elif tune:
-                self.text.insert('end', f'{show}\t\t{tune[:85]}\n')
+                self.text.insert('end', f'{show}\t\t{tune[:77]}\n')
         self.text.configure(state='disabled')
 
     def resize(self):
@@ -438,7 +440,7 @@ class Hawk(tk.LabelFrame):
         self.text.configure(height=max(len(self.play)+1, 4))
         self.text.delete(1.0, tk.END)
 
-    def thread_stop(self):
+    def thread_switch(self, evt=None):
         if self.threaded:
             self.threaded = False
         else:
