@@ -353,7 +353,7 @@ class Hawk(tk.LabelFrame):
         opt_seconds.grid(row=0, column=3, sticky=tk.EW)
         btn_quit.grid(row=0, column=4, sticky=tk.EW, ipadx=12)
         self.text.grid(row=1, column=0, columnspan=5, sticky=tk.EW)
-        self.master.bind('<space>', self.thread_switch)
+        self.parent.bind('<space>', self.thread_switch)
 
     def announce(self, artist, show):
         if self.autoplay.get() and show['site'] == 'Soma.fm':
