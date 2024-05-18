@@ -345,7 +345,8 @@ class Hawk(tk.LabelFrame):
         self.text = tk.Text(self, height=4, font='Calibri 11')
         self.text.tag_configure('bold', font='Calibri 11 bold')
         self.text.configure(state='disabled')
-        self.text.bind("<Double-Button-1>", lambda x: self.popup('AddArtist'))
+        self.text.bind('<Double-Button-1>', lambda x: self.popup('AddArtist'))
+        self.parent.bind('<KeyRelease-space>', self.thread_switch)
 
         self.btn_pause.grid(row=0, column=0, sticky=tk.EW, ipadx=12)
         btn_artists.grid(row=0, column=1, sticky=tk.EW)
@@ -353,7 +354,6 @@ class Hawk(tk.LabelFrame):
         opt_seconds.grid(row=0, column=3, sticky=tk.EW)
         btn_quit.grid(row=0, column=4, sticky=tk.EW, ipadx=12)
         self.text.grid(row=1, column=0, columnspan=5, sticky=tk.EW)
-        self.parent.bind('<space>', self.thread_switch)
 
     def announce(self, artist, show):
         if self.autoplay.get() and show['site'] == 'Soma.fm':
@@ -379,7 +379,7 @@ class Hawk(tk.LabelFrame):
         if self.soma:
             response = requests.get(SOMA)
             if response.status_code == 200:
-                self.soma = {x['id']: x['lastPlaying'] for x in response.json()['channels'] if x['id'] in self.soma}
+                self.soma = {x['id']: x['lastPlaying'][:58] for x in response.json()['channels'] if x['id'] in self.soma}
         return shows
 
     def monitor(self, evt=None):
@@ -394,7 +394,7 @@ class Hawk(tk.LabelFrame):
                     for artist,regx in artists:
                         if regx.search(tune):
                             if self.play.get(show['name']) != f'{tune}**':
-                                self.play[show['name']] = f'{tune}''**'
+                                self.play[show['name']] = f'{tune}**'
                                 self.announce(artist, show)
                             break
                     else:
@@ -441,17 +441,18 @@ class Hawk(tk.LabelFrame):
         self.text.delete(1.0, tk.END)
 
     def thread_switch(self, evt=None):
-        if self.threaded:
-            self.threaded = False
-        else:
-            self.btn_pause['text'] = 'WATCHING'
-            self.btn_pause['style'] = 'active.TButton'
-            self.play = {x['name']: '' for x in self.streams}
-            self.threaded = True
-            self.thread = threading.Thread(target=self.monitor)
-            self.thread._stop_event = threading.Event()
-            self.thread.start()
-            self.thread_wait()
+        if evt is None or str(evt.widget) == '.':
+            if self.threaded:
+                self.threaded = False
+            else:
+                self.btn_pause['text'] = 'WATCHING'
+                self.btn_pause['style'] = 'active.TButton'
+                self.play = {x['name']: '' for x in self.streams}
+                self.threaded = True
+                self.thread = threading.Thread(target=self.monitor)
+                self.thread._stop_event = threading.Event()
+                self.thread.start()
+                self.thread_wait()
 
     def thread_test(self, *args, **kwargs):
         if not self.threaded:
