@@ -399,11 +399,14 @@ class Hawk(tk.LabelFrame):
                             break
                     else:
                         self.play[show['name']] = tune
+                    if self.thread._stop_event.is_set():
+                        break
                     self.refresh()
-            for _ in range(int(self.second.get()[6:8]) * 5):
-                if self.thread._stop_event.is_set() or self.changed:
-                    break
-                sleep(0.2)
+            if not self.thread._stop_event.is_set():
+                for _ in range(int(self.second.get()[6:8]) * 5):
+                    if self.thread._stop_event.is_set() or self.changed:
+                        break
+                    sleep(0.2)
 
     def popup(self, win='Streams'):
         if win == 'Arrange' and len(self.streams) <= 1:
@@ -418,8 +421,9 @@ class Hawk(tk.LabelFrame):
             self.win = globals()[win](self)
 
     def quit(self):
-        self.thread._stop_event.set()
-        sleep(0.2)
+        if self.thread.is_alive() and not self.thread._stop_event.is_set():
+            self.thread._stop_event.set()
+            sleep(0.2)
         self.parent.quit()
 
     def refresh(self):
