@@ -237,7 +237,7 @@ class Manage(Popup):
     
     def latest(self, name):
         self.destroy()
-        messagebox.showerror('StreamHawk Download', f'Updating available {name.title()} streams...please be patient!')
+        messagebox.showerror('StreamHawk Download', f'Updating available {name.title()} streams...')
         globals()[f'get_{name}']()
         setattr(self, name, jload(name))
         self.parent.popup('Manage')
