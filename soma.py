@@ -1,12 +1,12 @@
 import requests
-from app import SOMA, jdump
+from loader import SOMA, jdump
 
 
 def get_soma():
-    'get Soma.fm channel names/ids via API'
+    'download Soma.fm stream names & IDs'
     response = requests.get(SOMA)
     if response.status_code == 200:
 
-        # save SomaFM names
-        shows = response.json()['channels']
-        jdump({x['title']: x['id'] for x in shows}, 'soma')
+        shows = [(x['title'], x['id']) for x in response.json()['channels']]
+        shows.sort(key=lambda x: x[0].lower())
+        jdump(dict(shows), 'soma')

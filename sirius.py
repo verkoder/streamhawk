@@ -1,13 +1,12 @@
 import requests
-from app import jdump
+from loader import SIRIUS, jdump
 
 
 def get_sirius():
-    'get all station name IDs via Sirius API'
-    response = requests.get('https://xmplaylist.com/api/station')
+    'download SiriusXM stream names & IDs'
+    response = requests.get(SIRIUS)
     if response.status_code == 200:
 
-        # save SiriusXM name & station IDs
         shows = [(x['name'], x['id']) for x in response.json()]
-        shows = {k: v for k,v in sorted(shows)}
-        jdump(shows, 'sirius')
+        shows.sort(key=lambda x: x[0].lower())
+        jdump(dict(shows), 'sirius')

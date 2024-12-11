@@ -1,4 +1,3 @@
-import json
 import re
 import requests
 import threading
@@ -10,31 +9,10 @@ from os import system
 from time import sleep
 from urllib.parse import quote_plus
 
+from loader import SITES, SOMA, hawk_error, jdump, jload
+from sirius import get_sirius
+from soma import get_soma
 
-SITES = {'soma': 'Soma.fm',
-         'sirius': 'SiriusXM'}
-SOMA = 'http://api.somafm.com/channels.json'
-
-def hawk_error(msg):
-    messagebox.showerror('StreamHawk Error', msg)
-
-def jload(name):
-    try:
-        with open(f'{name}.json') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        data = [] if name in ('artists', 'streams') else {}
-        json.dump(data, open(f'{name}.json', 'w'), indent=4)
-        return data
-    except json.JSONDecodeError as err:
-        hawk_error(f'Error in "{name}.json" file:\n{err}')
-
-def jdump(data, name):
-    try:
-        with open(f'{name}.json', 'w') as f:
-            json.dump(data, f, indent=4)
-    except FileNotFoundError:
-        hawk_error(f'Missing file: "{name}.json"')
 
 # POPUP WINDOWS
 class Popup(tk.Toplevel):
@@ -188,10 +166,16 @@ class Manage(Popup):
 
         nav = tk.LabelFrame(self, background='black', pady=5, border=0)
         nav.pack()
-        btn_delete = ttk.Button(nav, text='Delete Selected', command=self.delete)
         btn_close = ttk.Button(nav, text='Close', command=self.parent.popup)
-        btn_delete.grid(row=0, column=0, padx=5, ipadx=20)
-        btn_close.grid(row=0, column=1, padx=5)
+        btn_remove = ttk.Button(nav, text='Remove Selected', command=self.delete)
+        txt_update = ttk.Label(nav, text='Dowload:', background='black', foreground='white')
+        btn_soma = ttk.Button(nav, text='Soma.fm', command=lambda: self.latest('soma'))
+        btn_sirius = ttk.Button(nav, text='SiriusXM', command=lambda: self.latest('sirius'))
+        btn_close.grid(row=0, column=0, padx=75)
+        btn_remove.grid(row=0, column=1, padx=5, ipadx=5)
+        txt_update.grid(row=0, column=2, padx=10)
+        btn_soma.grid(row=0, column=3, padx=2)
+        btn_sirius.grid(row=0, column=4, padx=2)
 
         meta = tk.LabelFrame(self, background='black', pady=5, border=0)
         meta.pack()
@@ -199,8 +183,8 @@ class Manage(Popup):
         self.sirius = jload('sirius')
 
         soma_var = tk.StringVar(value=list(self.soma.keys()))
-        soma_frame = tk.LabelFrame(meta, text='Soma.fm Streams', padx=5, pady=5, background='white', border=0,
-                                   font='Calibri 14 bold')
+        soma_frame = tk.LabelFrame(meta, text=f'Soma.fm Streams ({len(self.soma)})', padx=5, pady=5,
+                                   background='white', border=0, font='Calibri 14 bold')
         soma_frame.grid(row=1, column=0)
         self.list_soma = tk.Listbox(soma_frame, listvariable=soma_var, selectmode='multiple', height=30, width=18)
         self.list_soma.grid(row=0, column=0)
@@ -208,16 +192,16 @@ class Manage(Popup):
         adbtn_soma.grid(row=0, column=1, padx=5, sticky=tk.E)
 
         self.stream_var = tk.StringVar(value=[x['name'] for x in self.parent.streams])
-        stream_frame = tk.LabelFrame(meta, text='Added Streams', padx=5, pady=5, background='white', border=0,
-                                     font='Calibri 14 bold')
+        stream_frame = tk.LabelFrame(meta, text=f'Added Streams ({len(self.parent.streams)})', padx=5, pady=5,
+                                     background='white', border=0, font='Calibri 14 bold')
         stream_frame.grid(row=1, column=2)
         self.list_shows = tk.Listbox(stream_frame, listvariable=self.stream_var, selectmode='multiple', height=30, width=18)
         self.list_shows.bind('<Button-2>', self.rename)
         self.list_shows.pack()
 
         sirius_var = tk.StringVar(value=list(self.sirius.keys()))
-        sirius_frame = tk.LabelFrame(meta, text='SiriusXM Streams'.rjust(45), padx=5, pady=5, background='white', border=0,
-                                    font='Calibri 14 bold')
+        sirius_frame = tk.LabelFrame(meta, text=f'SiriusXM Streams ({len(self.sirius)})'.rjust(51), padx=5, pady=5,
+                                     background='white', border=0, font='Calibri 14 bold')
         sirius_frame.grid(row=1, column=4)
         self.list_sirius = tk.Listbox(sirius_frame, listvariable=sirius_var, selectmode='multiple', height=30, width=22)
         self.list_sirius.grid(row=0, column=1)
@@ -250,6 +234,13 @@ class Manage(Popup):
         dels = [rows[x] for x in self.list_shows.curselection()]
         self.parent.streams = [x for x in self.parent.streams if not x['name'] in dels]
         self.save()
+    
+    def latest(self, name):
+        self.destroy()
+        messagebox.showerror('StreamHawk Download', f'Updating available {name.title()} streams...please be patient!')
+        globals()[f'get_{name}']()
+        setattr(self, name, jload(name))
+        self.parent.popup('Manage')
 
     def rename(self, evt):
         rows = evt.widget.curselection()
