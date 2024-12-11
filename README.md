@@ -19,6 +19,10 @@ Adding Streams
 --------------
 Click Manage to add Soma.fm and SiriusXM streams. To rename, right-click an added stream.
 
+Download Streams List
+---------------------
+Click a provider to download & update its list of available streams.
+
 Monitoring Streams
 ------------------
 Hit SPACEBAR or the PAUSED / WATCHING button to start / stop updating the playlist, in 15/30/45-second intervals. Favorites are shown in bold, and optionally announced and streamed.
