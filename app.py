@@ -168,7 +168,7 @@ class Manage(Popup):
         nav.pack()
         btn_close = ttk.Button(nav, text='Close', command=self.parent.popup)
         btn_remove = ttk.Button(nav, text='Remove Selected', command=self.delete)
-        txt_update = ttk.Label(nav, text='Dowload:', background='black', foreground='white')
+        txt_update = ttk.Label(nav, text='Update:', background='black', foreground='white')
         btn_soma = ttk.Button(nav, text='Soma.fm', command=lambda: self.latest('soma'))
         btn_sirius = ttk.Button(nav, text='SiriusXM', command=lambda: self.latest('sirius'))
         btn_close.grid(row=0, column=0, padx=75)
@@ -237,7 +237,7 @@ class Manage(Popup):
     
     def latest(self, name):
         self.destroy()
-        messagebox.showerror('StreamHawk Download', f'Updating available {name.title()} streams...')
+        messagebox.showerror('StreamHawk Download', f'Updating {name.title()} streams...')
         globals()[f'get_{name}']()
         setattr(self, name, jload(name))
         self.parent.popup('Manage')

@@ -15,13 +15,13 @@ Choosing Streams
 ----------------
 Click Streams to see the current list. Mark the checkbox to monitor a stream. Check Play to auto-start favorites (VLC required, Soma.fm streams only). Check Talk and choose voices to announce favorites. Click Arrange to change order.
 
-Adding Streams
---------------
-Click Manage to add Soma.fm and SiriusXM streams. To rename, right-click an added stream.
+Managing Streams
+----------------
+Click Manage to add or remove Soma.fm and SiriusXM streams. To rename, right-click an added stream.
 
-Download Streams List
----------------------
-Click a provider to download & update its list of available streams.
+Updating Streams List
+------------------------
+Click a provider to download and update its list of available streams.
 
 Monitoring Streams
 ------------------
