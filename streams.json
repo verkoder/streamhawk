@@ -15,6 +15,13 @@
     },
     {
         "active": true,
+        "id": "suburbsofgoa",
+        "name": "Suburbs of Goa",
+        "site": "Soma.fm",
+        "voice": "Lekha"
+    },
+    {
+        "active": true,
         "id": "sonicuniverse",
         "name": "Sonic Universe",
         "site": "Soma.fm",
@@ -22,10 +29,24 @@
     },
     {
         "active": true,
-        "id": "suburbsofgoa",
-        "name": "Suburbs of Goa",
+        "id": "specials",
+        "name": "SomaFM Specials",
         "site": "Soma.fm",
         "voice": "Lekha"
+    },
+    {
+        "active": true,
+        "id": "brfm",
+        "name": "Black Rock FM",
+        "site": "Soma.fm",
+        "voice": "Xander"
+    },
+    {
+        "active": true,
+        "id": "beatblender",
+        "name": "Beat Blender",
+        "site": "Soma.fm",
+        "voice": "Luca"
     },
     {
         "active": true,
@@ -35,31 +56,31 @@
         "voice": "Joana"
     },
     {
-        "active": false,
+        "active": true,
         "id": "groovesalad",
         "name": "Groove Salad",
         "site": "Soma.fm",
         "voice": "Maged"
     },
     {
-        "active": false,
-        "id": "thistle",
-        "name": "ThistleRadio",
-        "site": "Soma.fm",
-        "voice": "Luca"
-    },
-    {
-        "active": false,
-        "id": "u80s",
-        "name": "Underground 80s",
+        "active": true,
+        "id": "gsclassic",
+        "name": "Groove Salad Classic",
         "site": "Soma.fm",
         "voice": "Moira"
     },
     {
         "active": true,
-        "id": "specials",
-        "name": "SomaFM Specials",
+        "id": "reggae",
+        "name": "Heavyweight Reggae",
         "site": "Soma.fm",
-        "voice": "Karen"
+        "voice": "Thomas"
+    },
+    {
+        "active": true,
+        "id": "7soul",
+        "name": "Seven Inch Soul",
+        "site": "Soma.fm",
+        "voice": "Paulina"
     }
 ]
