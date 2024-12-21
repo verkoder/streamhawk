@@ -3,8 +3,8 @@ StreamHawk
 
 StreamHawk scans playlists to announce when your favorite artists are streaming.
 
-Compatible Streams
-------------------
+Compatible Streaming Services
+-----------------------------
 - SiriusXM
 - Soma.fm
 
@@ -17,11 +17,11 @@ Click Streams to see the current list. Mark the checkbox to monitor a stream. Ch
 
 Managing Streams
 ----------------
-Click Manage to add or remove Soma.fm and SiriusXM streams. To rename, right-click an added stream.
+Click Manage to add or remove streams from streaming services Soma.fm and/or SiriusXM. Add up to 24 streams. Streams cannot be added twice. To rename, right-click an added stream.
 
 Updating Streams List
-------------------------
-Click a provider to download and update its list of available streams.
+---------------------
+Click a streaming service to download and update its full list of available streams.
 
 Monitoring Streams
 ------------------
@@ -29,11 +29,12 @@ Hit SPACEBAR or the PAUSED / WATCHING button to start / stop updating the playli
 
 Adding Favorite Artists
 -----------------------
-Double-click the playlist to add new artists. Mark artist/s, and click Add. Click AllMusic info for details.
+Double-click the playlist to add new artists. Mark artist/s, and click Add. Click AllMusic info for track details.
 
 Editing Favorite Artists
 ------------------------
-Click Artists to see the full list. Add or delete, keeping one per line. You can use full artist names, partial names, song titles, or keywords.
+Click Artists to see the full list. Add or delete, keeping one name per line. Streams match by full or partial artist name. Optionally match track names as well with a starting asterisk:
+```*Dreadlock Holiday```
 
 CUSTOMIZING
 ===========
@@ -43,9 +44,9 @@ Right-click on StreamHawk and Show Package Contents. See the files in Contents/R
 Resetting User Data
 -------------------
 User data is stored as three JSON files. Delete to reset.
-- artists.json – artists & keywords
+- artists.json – favorite artists
 - streams.json – added streams
-- user.json - app preferences
+- user.json - user preferences
 
 Customizing Streams
 -------------------
