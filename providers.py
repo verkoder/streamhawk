@@ -7,7 +7,7 @@ def get_sirius():
     response = requests.get(SIRIUS)
     if response.status_code == 200:
 
-        shows = [(x['name'], x['id']) for x in response.json()]
+        shows = [(x['name'], x['id']) for x in response.json()['results']]
         shows.sort(key=lambda x: x[0].lower())
         jdump(dict(shows), 'sirius')
 
