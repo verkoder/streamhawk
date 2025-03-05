@@ -1,10 +1,24 @@
 [
     {
+        "active": false,
+        "id": "dronezone",
+        "name": "Drone Zone",
+        "site": "Soma.fm",
+        "voice": "Fred"
+    },
+    {
         "active": true,
         "id": "secretagent",
         "name": "Secret Agent",
         "site": "Soma.fm",
         "voice": "Yuri"
+    },
+    {
+        "active": true,
+        "id": "u80s",
+        "name": "Underground 80s",
+        "site": "Soma.fm",
+        "voice": "Moira"
     },
     {
         "active": true,
@@ -15,10 +29,10 @@
     },
     {
         "active": true,
-        "id": "suburbsofgoa",
-        "name": "Suburbs of Goa",
+        "id": "beatblender",
+        "name": "Beat Blender",
         "site": "Soma.fm",
-        "voice": "Lekha"
+        "voice": "Xander"
     },
     {
         "active": true,
@@ -29,24 +43,10 @@
     },
     {
         "active": true,
-        "id": "specials",
-        "name": "SomaFM Specials",
+        "id": "suburbsofgoa",
+        "name": "Suburbs of Goa",
         "site": "Soma.fm",
         "voice": "Lekha"
-    },
-    {
-        "active": true,
-        "id": "brfm",
-        "name": "Black Rock FM",
-        "site": "Soma.fm",
-        "voice": "Xander"
-    },
-    {
-        "active": true,
-        "id": "beatblender",
-        "name": "Beat Blender",
-        "site": "Soma.fm",
-        "voice": "Luca"
     },
     {
         "active": true,
@@ -57,30 +57,16 @@
     },
     {
         "active": true,
-        "id": "groovesalad",
-        "name": "Groove Salad",
+        "id": "brfm",
+        "name": "Black Rock FM",
         "site": "Soma.fm",
-        "voice": "Maged"
+        "voice": "Luca"
     },
     {
         "active": true,
-        "id": "gsclassic",
-        "name": "Groove Salad Classic",
+        "id": "specials",
+        "name": "SomaFM Specials",
         "site": "Soma.fm",
-        "voice": "Moira"
-    },
-    {
-        "active": true,
-        "id": "reggae",
-        "name": "Heavyweight Reggae",
-        "site": "Soma.fm",
-        "voice": "Thomas"
-    },
-    {
-        "active": true,
-        "id": "7soul",
-        "name": "Seven Inch Soul",
-        "site": "Soma.fm",
-        "voice": "Paulina"
+        "voice": "Karen"
     }
 ]
